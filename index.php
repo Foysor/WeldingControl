@@ -73,7 +73,7 @@
     </div>
 </section>
 
-    <!-- Тесты -->
+    Тесты
     <section id="tests" class="my-5">
         <h2 class="text-center mb-4">Решение тестов</h2>
         <div class="text-center">
