@@ -11,99 +11,101 @@
 <body>
 
 <!-- Навигационная панель -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Контроль качества сварки</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#documents">Документы</a></li>
-                <li class="nav-item"><a class="nav-link" href="#lectures">Лекции</a></li>
-                <li class="nav-item"><a class="nav-link" href="#tests">Тесты</a></li>
-                <li class="nav-item"><a class="nav-link" href="#attestation">Аттестация</a></li>
-            </ul>
-        </div>
-    </div>
+<header class="bg-dark text-white py-4 text-center">
+    <h1>Контроль качества сварки</h1>
+</header>
+
+<!-- Центрированные кнопки навигации -->
+<nav class="d-flex justify-content-center my-3">
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link btn btn-outline-light mx-2" href="#documents">Документы</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn btn-outline-light mx-2" href="#lectures">Лекции</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn btn-outline-light mx-2" href="#tests">Тесты</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn btn-outline-light mx-2" href="#attestation">Аттестация</a>
+        </li>
+    </ul>
 </nav>
 
-<!-- Главное содержимое -->
 <div class="container my-5">
-
-    <!-- Документы -->
+    <!-- Документы с выпадающим списком -->
     <section id="documents" class="my-5">
         <h2 class="text-center mb-4">Просмотр документов</h2>
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Документ 1</h5>
-                        <p class="card-text">Описание документа, касающегося контроля качества сварки.</p>
-                        <a href="document1.pdf" target="_blank" class="btn btn-primary">Открыть документ</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Документ 2</h5>
-                        <p class="card-text">Описание второго документа для контроля сварных соединений.</p>
-                        <a href="document2.pdf" target="_blank" class="btn btn-primary">Открыть документ</a>
-                    </div>
-                </div>
+                <label for="documentSelect" class="form-label">Выберите нормативный документ:</label>
+                <select class="form-select" id="documentSelect" onchange="window.open(this.value, '_blank')">
+                    <option value="" disabled selected>Выберите документ</option>
+                    <option value="document1.pdf">Документ 1</option>
+                    <option value="document2.pdf">Документ 2</option>
+                    <option value="document3.pdf">Документ 3</option>
+                </select>
             </div>
         </div>
     </section>
 
     <!-- Лекции -->
-    <section id="lectures" class="my-5">
-        <h2 class="text-center mb-4">Просмотр лекций</h2>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Лекция 1</h5>
-                        <p class="card-text">Основы визуального контроля сварки.</p>
-                        <a href="lecture1.mp4" target="_blank" class="btn btn-primary">Смотреть лекцию</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Лекция 2</h5>
-                        <p class="card-text">Методы измерительного контроля сварных соединений.</p>
-                        <a href="lecture2.mp4" target="_blank" class="btn btn-primary">Смотреть лекцию</a>
-                    </div>
+ <section id="lectures" class="my-5">
+    <h2 class="text-center mb-4">Просмотр лекций</h2>
+    <div class="row justify-content-center">
+        <div class="col-12 mb-3">
+            <div class="card border-light shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Лекция 1: Основы визуального контроля</h5>
+                    <a href="lecture1.mp4" target="_blank" class="btn btn-primary mt-3">Смотреть лекцию</a>
                 </div>
             </div>
         </div>
-    </section>
+        <div class="col-12 mb-3">
+            <div class="card border-light shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Лекция 2: Методы измерительного контроля</h5>
+                    <a href="lecture2.mp4" target="_blank" class="btn btn-primary mt-3">Смотреть лекцию</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
     <!-- Тесты -->
-    <!-- <section id="tests" class="my-5">
+    <section id="tests" class="my-5">
         <h2 class="text-center mb-4">Решение тестов</h2>
         <div class="text-center">
             <a href="test1.php" class="btn btn-success m-2">Тест 1</a>
             <a href="test2.php" class="btn btn-success m-2">Тест 2</a>
         </div>
-    </section> -->
+    </section>
 
     <!-- Аттестация -->
     <section id="attestation" class="my-5">
         <h2 class="text-center mb-4">Проведение аттестации</h2>
-        <p class="text-center">Аттестацию проводит инженер, заполняя параметры сварного шва, выполненного аттестуемым сварщиком.</p>
+        <p class="text-center">Инженер заполняет параметры сварного шва, сделанного аттестуемым сварщиком.</p>
         <div class="text-center">
             <a href="attestation.php" class="btn btn-danger">Начать аттестацию</a>
         </div>
     </section>
-
 </div>
 
-<!-- Подвал -->
+<!-- Подвал с индикатором подключения к базе данных -->
 <footer class="bg-dark text-white text-center py-3">
     <p>&copy; 2024 Система контроля качества сварных соединений</p>
+    <p>
+        <?php
+        // Индикатор подключения к БД (на будущее)
+        $db_connected = false; // Здесь будет код для проверки подключения к БД
+        if ($db_connected) {
+            echo '<span class="badge bg-success">Подключение к базе данных: Активно</span>';
+        } else {
+            echo '<span class="badge bg-danger">Подключение к базе данных: Отсутствует</span>';
+        }
+        ?>
+    </p>
 </footer>
 
 <!-- Bootstrap JS -->

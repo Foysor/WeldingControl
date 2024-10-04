@@ -37,13 +37,55 @@ section {
     background-color: white;
     border-radius: 5px;
 }
+/* Растягивание блоков по всей ширине */
+.card {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    width: 100%; /* Растягивает блок на всю ширину */
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Индикатор подключения к БД в правом нижнем углу */
+.db-status-indicator {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+}
+
+/* Индикатор подключения к БД в правом нижнем углу */
+.db-status-indicator {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem; /* Сделать шрифт меньше */
+    color: grey; /* Цвет текста серый */
+}
+
+
+.btn-primary {
+    padding: 10px 20px;
+    font-size: 1rem;
+}
 
 footer {
+    position: relative;
     text-align: center;
     padding: 10px;
     background-color: #333;
     color: white;
-    position: fixed;
     bottom: 0;
     width: 100%;
 }
