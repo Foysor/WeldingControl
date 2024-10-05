@@ -72,8 +72,6 @@
         </div>
     </div>
 </section>
-
-    Тесты
     <section id="tests" class="my-5">
         <h2 class="text-center mb-4">Решение тестов</h2>
         <div class="text-center">
@@ -92,21 +90,41 @@
     </section>
 </div>
 
-<!-- Подвал с индикатором подключения к базе данных -->
-<footer class="bg-dark text-white text-center py-3">
+
+ <region> <!-- Подвал с индикатором подключения к базе данных -->
+<footer class="bg-dark text-white text-center py-3 position-relative">
     <p>&copy; 2024 Система контроля качества сварных соединений</p>
-    <p>
-        <?php
-        // Индикатор подключения к БД (на будущее)
-        $db_connected = false; // Здесь будет код для проверки подключения к БД
-        if ($db_connected) {
-            echo '<span class="badge bg-success">Подключение к базе данных: Активно</span>';
-        } else {
-            echo '<span class="badge bg-danger">Подключение к базе данных: Отсутствует</span>';
-        }
-        ?>
-    </p>
+    <div style="position: absolute; bottom: 10px; right: 10px;">
+    <?php
+// Подключение к базе данных MySQL
+$host = 'localhost';
+$dbname = 'test';  // Имя вашей базы данных
+$username = 'root';  // Пользователь XAMPP по умолчанию
+$password = '';  // Пароль по умолчанию пуст
+
+// Индикатор подключения к базе данных
+$db_connected = false; // По умолчанию считаем, что соединения нет
+
+// Попробуем подключиться к базе данных
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db_connected = true; // Если подключение удалось, меняем флаг
+} catch (PDOException $e) {
+    $db_connected = false; // В случае ошибки подключения флаг остаётся ложным
+}
+
+// Отображение состояния подключения
+if ($db_connected) {
+    echo '<span class="badge bg-success">Подключение к базе данных: Активно</span>';
+} else {
+    echo '<span class="badge bg-danger">Подключение к базе данных: Отсутствует</span>';
+}
+?>
+
+    </div>
 </footer>
+</region>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
