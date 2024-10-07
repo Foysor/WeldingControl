@@ -7,6 +7,42 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Скрываем лекции и тесты после третьей по умолчанию */
+        .lecture-card,
+        .test-block {
+            display: none;
+        }
+
+        /* Показываем первые три лекции и теста */
+        .lecture-card:nth-of-type(-n+3),
+        .test-block:nth-of-type(-n+3) {
+            display: block;
+        }
+
+        /* Фиксированная шапка */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+
+        /* Отступ для основного контента чтобы не перекрывалось шапкой */
+        body {
+            padding-top: 100px;
+        }
+
+        /* Кнопка "Вверх" */
+        #backToTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            z-index: 1030;
+        }
+    </style>
 </head>
 <body>
 
@@ -51,32 +87,81 @@
     </section>
 
     <!-- Лекции -->
- <section id="lectures" class="my-5">
-    <h2 class="text-center mb-4">Просмотр лекций</h2>
-    <div class="row justify-content-center">
-        <div class="col-12 mb-3">
-            <div class="card border-light shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Лекция 1: Основы визуального контроля</h5>
-                    <a href="lecture1.mp4" target="_blank" class="btn btn-primary mt-3">Смотреть лекцию</a>
-                </div>
-            </div>
+    <section id="lectures" class="my-5">
+        <h2 class="text-center mb-4">Просмотр лекций</h2>
+        <div class="row justify-content-center">
+            <?php
+            // Подключение к базе данных
+            $host = 'localhost';
+            $dbname = 'welding'; // Имя базы данных
+            $username = 'root'; // Имя пользователя
+            $password = ''; // Пароль (по умолчанию пустой)
+
+            try {
+                // Создаем подключение к базе данных
+                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                // Выполняем запрос для получения всех лекций
+                $sql = "SELECT * FROM lecture";
+                $stmt = $pdo->query($sql);
+
+                // Проверка, есть ли лекции
+                if ($stmt->rowCount() > 0) {
+                    // Вывод каждой лекции в виде карточки
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        echo '
+                        <div class="col-12 mb-3 lecture-card">
+                            <div class="card border-light shadow-sm">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Лекция ' . $row["IDlec"] . ': ' . $row["Lecture"] . '</h5>
+                                    <a href="lecture' . $row["IDlec"] . '.mp4" target="_blank" class="btn btn-primary mt-3">Смотреть лекцию</a>
+                                </div>
+                            </div>
+                        </div>';
+                    }
+                } else {
+                    echo '<p class="text-center">Лекций пока нет.</p>';
+                }
+
+            } catch (PDOException $e) {
+                echo 'Ошибка подключения: ' . $e->getMessage();
+            }
+            ?>
         </div>
-        <div class="col-12 mb-3">
-            <div class="card border-light shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Лекция 2: Методы измерительного контроля</h5>
-                    <a href="lecture2.mp4" target="_blank" class="btn btn-primary mt-3">Смотреть лекцию</a>
-                </div>
-            </div>
+        <div class="text-center mt-4">
+            <button class="btn btn-light toggle-btn" data-target="lecture-card">Показать ещё</button>
         </div>
-    </div>
-</section>
+    </section>
+
+    <!-- Тесты -->
     <section id="tests" class="my-5">
         <h2 class="text-center mb-4">Решение тестов</h2>
-        <div class="text-center">
-            <a href="test1.php" class="btn btn-success m-2">Тест 1</a>
-            <a href="test2.php" class="btn btn-success m-2">Тест 2</a>
+        <div class="row justify-content-center" id="testContainer">
+            <?php
+            try {
+                // Выполняем запрос для получения всех тестов
+                $stmt = $pdo->query("SELECT * FROM testing");
+                $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Вывод тестов
+                foreach ($tests as $index => $test) {
+                    echo '<div class="col-12 mb-3 test-block">
+                            <div class="card border-light shadow-sm">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">' . $test['test'] . '</h5>
+                                    <a href="test' . $test['IDtest'] . '.php" target="_blank" class="btn btn-success mt-3">Начать тест</a>
+                                </div>
+                            </div>
+                          </div>';
+                }
+            } catch (PDOException $e) {
+                echo 'Ошибка подключения к базе данных: ' . $e->getMessage();
+            }
+            ?>
+        </div>
+        <div class="text-center mt-4">
+            <button class="btn btn-light toggle-btn" data-target="test-block">Показать ещё</button>
         </div>
     </section>
 
@@ -90,43 +175,59 @@
     </section>
 </div>
 
+<!-- Кнопка "Вверх" -->
+<button id="backToTopBtn" class="btn btn-secondary">Вверх</button>
 
- <region> <!-- Подвал с индикатором подключения к базе данных -->
+<!-- Подвал с индикатором подключения к базе данных -->
 <footer class="bg-dark text-white text-center py-3 position-relative">
     <p>&copy; 2024 Система контроля качества сварных соединений</p>
     <div style="position: absolute; bottom: 10px; right: 10px;">
-    <?php
-// Подключение к базе данных MySQL
-$host = 'localhost';
-$dbname = 'test';  // Имя вашей базы данных
-$username = 'root';  // Пользователь XAMPP по умолчанию
-$password = '';  // Пароль по умолчанию пуст
-
-// Индикатор подключения к базе данных
-$db_connected = false; // По умолчанию считаем, что соединения нет
-
-// Попробуем подключиться к базе данных
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $db_connected = true; // Если подключение удалось, меняем флаг
-} catch (PDOException $e) {
-    $db_connected = false; // В случае ошибки подключения флаг остаётся ложным
-}
-
-// Отображение состояния подключения
-if ($db_connected) {
-    echo '<span class="badge bg-success">Подключение к базе данных: Активно</span>';
-} else {
-    echo '<span class="badge bg-danger">Подключение к базе данных: Отсутствует</span>';
-}
-?>
-
+        <?php
+        // Отображение состояния подключения
+        if ($pdo) {
+            echo '<span class="badge bg-success">Подключение к базе данных: Активно</span>';
+        } else {
+            echo '<span class="badge bg-danger">Подключение к базе данных: Отсутствует</span>';
+        }
+        ?>
     </div>
 </footer>
-</region>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Скрипт для отображения всех лекций и тестов при нажатии на кнопку -->
+<script>
+    document.querySelectorAll('.toggle-btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var targetClass = button.getAttribute('data-target');
+            var elements = document.querySelectorAll('.' + targetClass);
+            var isCollapsed = button.textContent.trim() === 'Показать ещё';
+
+            elements.forEach(function (element, index) {
+                if (index >= 3) {
+                    element.style.display = isCollapsed ? 'block' : 'none';
+                }
+            });
+
+            button.textContent = isCollapsed ? 'Свернуть' : 'Показать ещё';
+        });
+    });
+
+    // Скрипт для кнопки "Вверх"
+    var backToTopBtn = document.getElementById("backToTopBtn");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            backToTopBtn.style.display = "block";
+        } else {
+            backToTopBtn.style.display = "none";
+        }
+    };
+
+    backToTopBtn.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+</script>
+
 </body>
 </html>

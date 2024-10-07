@@ -1,7 +1,7 @@
 <?php
 // Подключение к базе данных MySQL
 $host = 'localhost';
-$dbname = 'test';  // Имя вашей базы данных
+$dbname = 'welding';  // Имя вашей базы данных
 $username = 'root';  // Пользователь XAMPP по умолчанию
 $password = '';  // Пароль по умолчанию пуст
 
@@ -15,7 +15,7 @@ try {
 
 // Выполняем запрос к таблице
 try {
-    $query = "SELECT * FROM table1";
+    $query = "SELECT * FROM lecture";
     $stmt = $pdo->query($query);
 
     // Подключаем CSS для стилизации таблицы
