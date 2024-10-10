@@ -34,17 +34,34 @@
             padding-top: 100px;
         }
 
-        /* Кнопка "Вверх" */
+        /* Кнопка "Вверх" / "Вниз" */
         #backToTopBtn {
             position: fixed;
-            bottom: 20px;
             right: 20px;
+            bottom: 20px;
             display: none;
             z-index: 1030;
         }
     </style>
 </head>
 <body>
+
+<?php
+// Подключение к базе данных
+$host = 'localhost';
+$dbname = 'welding'; // Имя базы данных
+$username = 'root'; // Имя пользователя
+$password = ''; // Пароль (по умолчанию пустой)
+
+try {
+    // Создаем подключение к базе данных
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo '<div class="alert alert-danger text-center">Ошибка подключения к базе данных: ' . $e->getMessage() . '</div>';
+    $pdo = null;
+}
+?>
 
 <!-- Навигационная панель -->
 <header class="bg-dark text-white py-4 text-center">
@@ -77,11 +94,31 @@
             <div class="col-md-6">
                 <label for="documentSelect" class="form-label">Выберите нормативный документ:</label>
                 <select class="form-select" id="documentSelect" onchange="window.open(this.value, '_blank')">
-                    <option value="" disabled selected>Выберите документ</option>
-                    <option value="document1.pdf">Документ 1</option>
-                    <option value="document2.pdf">Документ 2</option>
-                    <option value="document3.pdf">Документ 3</option>
-                </select>
+    <option value="" disabled selected>Выберите документ</option>
+    <?php
+    if ($pdo) {
+        try {
+            // Выполняем запрос для получения всех документов
+            $stmt = $pdo->query("SELECT document FROM docs");
+            $docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Проверяем, есть ли документы в таблице
+            if (count($docs) > 0) {
+                // Выводим каждый документ как опцию
+                foreach ($docs as $doc) {
+                    echo '<option value="' . htmlspecialchars($doc['document']) . '">' . htmlspecialchars($doc['document']) . '</option>';
+                }
+            } else {
+                echo '<option value="" disabled>Документы отсутствуют в базе данных</option>';
+            }
+        } catch (PDOException $e) {
+            echo '<option value="" disabled>Ошибка загрузки документов: ' . $e->getMessage() . '</option>';
+        }
+    } else {
+        echo '<option value="" disabled>Нет подключения к базе данных</option>';
+    }
+    ?>
+</select>
             </div>
         </div>
     </section>
@@ -91,41 +128,34 @@
         <h2 class="text-center mb-4">Просмотр лекций</h2>
         <div class="row justify-content-center">
             <?php
-            // Подключение к базе данных
-            $host = 'localhost';
-            $dbname = 'welding'; // Имя базы данных
-            $username = 'root'; // Имя пользователя
-            $password = ''; // Пароль (по умолчанию пустой)
+            if ($pdo) {
+                try {
+                    // Выполняем запрос для получения всех лекций
+                    $sql = "SELECT * FROM lecture";
+                    $stmt = $pdo->query($sql);
 
-            try {
-                // Создаем подключение к базе данных
-                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                // Выполняем запрос для получения всех лекций
-                $sql = "SELECT * FROM lecture";
-                $stmt = $pdo->query($sql);
-
-                // Проверка, есть ли лекции
-                if ($stmt->rowCount() > 0) {
-                    // Вывод каждой лекции в виде карточки
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        echo '
-                        <div class="col-12 mb-3 lecture-card">
-                            <div class="card border-light shadow-sm">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Лекция ' . $row["IDlec"] . ': ' . $row["Lecture"] . '</h5>
-                                    <a href="lecture' . $row["IDlec"] . '.mp4" target="_blank" class="btn btn-primary mt-3">Смотреть лекцию</a>
+                    // Проверка, есть ли лекции
+                    if ($stmt->rowCount() > 0) {
+                        // Вывод каждой лекции в виде карточки
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo '
+                            <div class="col-12 mb-3 lecture-card">
+                                <div class="card border-light shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Лекция ' . htmlspecialchars($row["IDlec"]) . ': ' . htmlspecialchars($row["Lecture"]) . '</h5>
+                                        <a href="lecture' . htmlspecialchars($row["IDlec"]) . '.mp4" target="_blank" class="btn btn-primary mt-3">Смотреть лекцию</a>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>';
+                            </div>';
+                        }
+                    } else {
+                        echo '<p class="text-center">Лекций пока нет.</p>';
                     }
-                } else {
-                    echo '<p class="text-center">Лекций пока нет.</p>';
+                } catch (PDOException $e) {
+                    echo '<p class="text-center text-danger">Ошибка загрузки лекций: ' . $e->getMessage() . '</p>';
                 }
-
-            } catch (PDOException $e) {
-                echo 'Ошибка подключения: ' . $e->getMessage();
+            } else {
+                echo '<p class="text-center text-danger">Нет подключения к базе данных</p>';
             }
             ?>
         </div>
@@ -139,24 +169,28 @@
         <h2 class="text-center mb-4">Решение тестов</h2>
         <div class="row justify-content-center" id="testContainer">
             <?php
-            try {
-                // Выполняем запрос для получения всех тестов
-                $stmt = $pdo->query("SELECT * FROM testing");
-                $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if ($pdo) {
+                try {
+                    // Выполняем запрос для получения всех тестов
+                    $stmt = $pdo->query("SELECT * FROM testing");
+                    $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // Вывод тестов
-                foreach ($tests as $index => $test) {
-                    echo '<div class="col-12 mb-3 test-block">
-                            <div class="card border-light shadow-sm">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">' . $test['test'] . '</h5>
-                                    <a href="test' . $test['IDtest'] . '.php" target="_blank" class="btn btn-success mt-3">Начать тест</a>
+                    // Вывод тестов
+                    foreach ($tests as $index => $test) {
+                        echo '<div class="col-12 mb-3 test-block">
+                                <div class="card border-light shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">' . htmlspecialchars($test['test']) . '</h5>
+                                        <a href="test' . htmlspecialchars($test['IDtest']) . '.php" target="_blank" class="btn btn-success mt-3">Начать тест</a>
+                                    </div>
                                 </div>
-                            </div>
-                          </div>';
+                              </div>';
+                    }
+                } catch (PDOException $e) {
+                    echo '<p class="text-center text-danger">Ошибка загрузки тестов: ' . $e->getMessage() . '</p>';
                 }
-            } catch (PDOException $e) {
-                echo 'Ошибка подключения к базе данных: ' . $e->getMessage();
+            } else {
+                echo '<p class="text-center text-danger">Нет подключения к базе данных</p>';
             }
             ?>
         </div>
@@ -175,8 +209,8 @@
     </section>
 </div>
 
-<!-- Кнопка "Вверх" -->
-<button id="backToTopBtn" class="btn btn-secondary">Вверх</button>
+<!-- Кнопка "Вверх" / "Вниз" -->
+<button id="backToTopBtn" class="btn btn-secondary">Вниз</button>
 
 <!-- Подвал с индикатором подключения к базе данных -->
 <footer class="bg-dark text-white text-center py-3 position-relative">
@@ -214,18 +248,45 @@
         });
     });
 
-    // Скрипт для кнопки "Вверх"
+    // Скрипт для кнопки "Вверх" / "Вниз"
     var backToTopBtn = document.getElementById("backToTopBtn");
+    var scrollDirection = "down";
+
     window.onscroll = function () {
-        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+        var backToTopBtn = document.getElementById("backToTopBtn");
+        var footer = document.querySelector("footer");
+        var footerRect = footer.getBoundingClientRect();
+        var windowHeight = window.innerHeight;
+        var scrollTop = window.scrollY;
+        var documentHeight = document.documentElement.scrollHeight;
+        var footerHeight = footer.offsetHeight;
+
+        // Показываем или скрываем кнопку в зависимости от положения страницы
+        if (scrollTop > 200) {
             backToTopBtn.style.display = "block";
+            backToTopBtn.textContent = "Вверх";
+            scrollDirection = "up";
         } else {
-            backToTopBtn.style.display = "none";
+            backToTopBtn.style.display = "block";
+            backToTopBtn.textContent = "Вниз";
+            scrollDirection = "down";
+        }
+
+        // Проверяем, чтобы кнопка не пересекала футер
+        var distanceToFooter = documentHeight - (scrollTop + windowHeight);
+        if (distanceToFooter <= footerHeight) {
+            backToTopBtn.style.bottom = (footerHeight - distanceToFooter + 20) + "px";
+        } else {
+            backToTopBtn.style.bottom = "20px";
         }
     };
 
     backToTopBtn.addEventListener("click", function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (scrollDirection === "down") {
+            window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     });
 </script>
 
