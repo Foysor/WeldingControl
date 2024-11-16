@@ -8,7 +8,6 @@ $username = 'root';
 $password = '';
 
 try {
-    // Создаем подключение к базе данных
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
@@ -16,7 +15,6 @@ try {
     exit();
 }
 
-// Получение параметров из запроса
 $document = isset($_GET['document']) ? $_GET['document'] : null;
 $wj_symbol = isset($_GET['wj_symbol']) ? $_GET['wj_symbol'] : null;
 
@@ -25,7 +23,6 @@ if (!$document || !$wj_symbol) {
     exit();
 }
 
-// Запрос к базе данных для получения эталонных значений из представления objprmview
 try {
     $stmt = $pdo->prepare("
         SELECT wall_thikness, b_nomin, b_error, c_nomin, c_error, e_nomin, e_error, g_nomin, g_error, 
@@ -39,6 +36,8 @@ try {
     $values = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($values) {
+        // Отладочный вывод
+        error_log(json_encode($values));
         echo json_encode(['success' => true, 'values' => $values]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Данные не найдены']);
@@ -47,4 +46,5 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Ошибка выполнения запроса: ' . $e->getMessage()]);
 }
-?>
+
+

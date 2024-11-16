@@ -165,57 +165,7 @@ try {
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.getElementById('designationSelect').addEventListener('change', function () {
-        const documentValue = document.getElementById('gostSelect').value;
-        const wjSymbol = this.value;
-
-        if (!documentValue || !wjSymbol) {
-            alert('Пожалуйста, выберите ГОСТ и обозначение соединения.');
-            return;
-        }
-
-        // Сделаем AJAX запрос к серверу для получения параметров из базы данных
-        fetch(`./get_standard_values.php?document=${documentValue}&wj_symbol=${wjSymbol}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const row = document.getElementById('parametersRow');
-                    row.innerHTML = `
-                        <td>${data.values.wall_thikness || '-'}</td>
-                        <td>${data.values.b_nomin || '-'}</td>
-                        <td>${data.values.b_error || '-'}</td>
-                        <td>${data.values.c_nomin || '-'}</td>
-                        <td>${data.values.c_error || '-'}</td>
-                        <td>${data.values.e_nomin || '-'}</td>
-                        <td>${data.values.e_error || '-'}</td>
-                        <td>${data.values.g_nomin || '-'}</td>
-                        <td>${data.values.g_error || '-'}</td>
-                        <td>${data.values.e1_nomin || '-'}</td>
-                        <td>${data.values.e1_error || '-'}</td>
-                        <td>${data.values.g1_nomin || '-'}</td>
-                        <td>${data.values.g1_error || '-'}</td>
-                        <td>${data.values.k_nomin || '-'}</td>
-                        <td>${data.values.k_error || '-'}</td>
-                        <td>${data.values.alpha || '-'}</td>
-                        <td>${data.values.alpha_error || '-'}</td>
-                        <td>${data.values.R || '-'}</td>
-                        <td>${data.values.i || '-'}</td>
-                        <td>${data.values.h_pm1 || '-'}</td>
-                        <td>${data.values.f_pm1 || '-'}</td>
-                    `;
-                    document.getElementById('parametersTable').style.display = 'block';
-                } else {
-                    alert('Не удалось загрузить параметры соединения.');
-                }
-            })
-            .catch(error => {
-                console.error('Ошибка при загрузке параметров соединения:', error);
-                alert('Ошибка при загрузке параметров соединения.');
-            });
-    });
-
     document.getElementById('compareBtn').addEventListener('click', function () {
-        // Логика сверки значений
         const documentValue = document.getElementById('gostSelect').value;
         const wjSymbol = document.getElementById('designationSelect').value;
 
@@ -224,25 +174,32 @@ try {
             return;
         }
 
-        // Сделаем AJAX запрос к серверу для получения эталонных значений
         fetch(`./get_standard_values.php?document=${documentValue}&wj_symbol=${wjSymbol}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Получаем значения из таблицы и сравниваем с эталонными, учитывая допустимые отклонения
                     const fields = ['thickness', 'b', 'c', 'e', 'g', 'e1', 'g1', 'k', 'alpha', 'r', 'i', 'h1', 'f1'];
                     let allMatch = true;
 
                     fields.forEach(field => {
                         const inputValue = parseFloat(document.getElementById(field).value);
-                        const nominValue = parseFloat(data.values[`${field}_nomin`] || 0);
-                        const errorValue = parseFloat(data.values[`${field}_error`] || 0);
+                        const nominValue = parseFloat(data.values[field + '_nomin'] || 0);
+                        const errorValue = parseFloat(data.values[field + '_error'] || 0);
 
-                        if (Math.abs(inputValue - nominValue) > errorValue) {
+                        if (!isNaN(nominValue) && !isNaN(errorValue)) {
+                            const isWithinTolerance = Math.abs(inputValue - nominValue) <= errorValue;
+                            if (!isWithinTolerance) {
+                                allMatch = false;
+                                document.getElementById(field).classList.add('is-invalid');
+                                document.getElementById(field).classList.remove('is-valid');
+                            } else {
+                                document.getElementById(field).classList.add('is-valid');
+                                document.getElementById(field).classList.remove('is-invalid');
+                            }
+                        } else {
                             allMatch = false;
                             document.getElementById(field).classList.add('is-invalid');
-                        } else {
-                            document.getElementById(field).classList.remove('is-invalid');
+                            document.getElementById(field).classList.remove('is-valid');
                         }
                     });
 
