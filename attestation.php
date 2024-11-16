@@ -1,18 +1,6 @@
 <?php
 // Подключение к базе данных
-$host = 'localhost';
-$dbname = 'welding'; // Имя базы данных
-$username = 'root'; // Имя пользователя
-$password = ''; // Пароль (по умолчанию пустой)
-
-try {
-    // Создаем подключение к базе данных
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo '<div class="alert alert-danger text-center">Ошибка подключения к базе данных: ' . $e->getMessage() . '</div>';
-    exit();
-}
+require_once 'db_connect.php';
 ?>
 
 <!DOCTYPE html>

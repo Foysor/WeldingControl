@@ -2,19 +2,7 @@
 header('Content-Type: application/json');
 
 // Подключение к базе данных
-$host = 'localhost';
-$dbname = 'welding'; // Имя базы данных
-$username = 'root'; // Имя пользователя
-$password = ''; // Пароль (по умолчанию пустой)
-
-try {
-    // Создаем подключение к базе данных
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Ошибка подключения к базе данных: ' . $e->getMessage()]);
-    exit();
-}
+require_once 'db_connect.php';
 
 // Получение параметра из запроса
 $documentId = isset($_GET['document']) ? $_GET['document'] : null;
@@ -40,4 +28,3 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Ошибка выполнения запроса: ' . $e->getMessage()]);
 }
-

@@ -1,17 +1,6 @@
 <?php
-// Подключение к базе данных MySQL
-$host = 'localhost';
-$dbname = 'welding';  // Имя вашей базы данных
-$username = 'root';  // Пользователь XAMPP по умолчанию
-$password = '';  // Пароль по умолчанию пуст
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "Ошибка подключения к базе данных: " . $e->getMessage();
-    exit;
-}
+// Подключение к базе данных
+require_once 'db_connect.php';
 
 // Выполняем запрос к таблице
 try {

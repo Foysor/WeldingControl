@@ -48,19 +48,7 @@
 
 <?php
 // Подключение к базе данных
-$host = 'localhost';
-$dbname = 'welding'; // Имя базы данных
-$username = 'root'; // Имя пользователя
-$password = ''; // Пароль (по умолчанию пустой)
-
-try {
-    // Создаем подключение к базе данных
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo '<div class="alert alert-danger text-center">Ошибка подключения к базе данных: ' . $e->getMessage() . '</div>';
-    $pdo = null;
-}
+require_once 'db_connect.php';
 ?>
 
 <!-- Навигационная панель -->
@@ -94,31 +82,31 @@ try {
             <div class="col-md-6">
                 <label for="documentSelect" class="form-label">Выберите нормативный документ:</label>
                 <select class="form-select" id="documentSelect" onchange="window.open(this.value, '_blank')">
-    <option value="" disabled selected>Выберите документ</option>
-    <?php
-    if ($pdo) {
-        try {
-            // Выполняем запрос для получения всех документов
-            $stmt = $pdo->query("SELECT document FROM docs");
-            $docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    <option value="" disabled selected>Выберите документ</option>
+                    <?php
+                    if ($pdo) {
+                        try {
+                            // Выполняем запрос для получения всех документов
+                            $stmt = $pdo->query("SELECT document FROM docs");
+                            $docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Проверяем, есть ли документы в таблице
-            if (count($docs) > 0) {
-                // Выводим каждый документ как опцию
-                foreach ($docs as $doc) {
-                    echo '<option value="' . htmlspecialchars($doc['document']) . '">' . htmlspecialchars($doc['document']) . '</option>';
-                }
-            } else {
-                echo '<option value="" disabled>Документы отсутствуют в базе данных</option>';
-            }
-        } catch (PDOException $e) {
-            echo '<option value="" disabled>Ошибка загрузки документов: ' . $e->getMessage() . '</option>';
-        }
-    } else {
-        echo '<option value="" disabled>Нет подключения к базе данных</option>';
-    }
-    ?>
-</select>
+                            // Проверяем, есть ли документы в таблице
+                            if (count($docs) > 0) {
+                                // Выводим каждый документ как опцию
+                                foreach ($docs as $doc) {
+                                    echo '<option value="' . htmlspecialchars($doc['document']) . '">' . htmlspecialchars($doc['document']) . '</option>';
+                                }
+                            } else {
+                                echo '<option value="" disabled>Документы отсутствуют в базе данных</option>';
+                            }
+                        } catch (PDOException $e) {
+                            echo '<option value="" disabled>Ошибка загрузки документов: ' . $e->getMessage() . '</option>';
+                        }
+                    } else {
+                        echo '<option value="" disabled>Нет подключения к базе данных</option>';
+                    }
+                    ?>
+                </select>
             </div>
         </div>
     </section>
